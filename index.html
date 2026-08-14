@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loop Community Platform</title>
+    <style>
+        /* BASE THEME VARIABLES (Dark Mode Default) */
+        :root {
+            --bg-body: #0d0f12;
+            --bg-surface: #16191e;
+            --bg-surface-hover: #1f232b;
+            --border-color: #272c35;
+            --border-highlight: #3a414e;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-primary: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-danger: #ef4444;
+            --dropdown-bg: #16191e;
+            --dropdown-hover: #1f232b;
+        }
+
+        /* LIGHT MODE VARIABLES OVERRIDE */
+        html.light {
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-surface-hover: #f1f5f9;
+            --border-color: #e2e8f0;
+            --border-highlight: #cbd5e1;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --accent-primary: #4f46e5;
+            --accent-hover: #4338ca;
+            --accent-danger: #dc2626;
+            --dropdown-bg: #ffffff;
+            --dropdown-hover: #f1f5f9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-bottom: 50px;
+            overflow-x: hidden;
+        }
+
+        /* Navbar Layout */
+        .navbar {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            cursor: pointer;
+        }
+
+        .ghost-badge {
+            background: rgba(251, 191, 36, 0.08);
+            border: 1px solid rgba(251, 191, 36, 0.25);
+            color: #fbbf24;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .theme-btn {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .theme-btn:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .create-btn {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .create-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        /* NOTIFICATION SYSTEM STYLES */
+        .notif-container {
+            position: relative;
+        }
+
+        .notif-btn {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .notif-btn:hover {
+            border-color: var(--border-highlight);
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--accent-danger);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            height: 16px;
+            min-width: 16px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid var(--bg-surface);
+        }
+
+        .notif-dropdown {
+            position: absolute;
+            right: 0;
+            top: 48px;
+            width: 320px;
+            background: var(--dropdown-bg);
+            border: 1px solid var(--border-highlight);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            z-index: 200;
+            overflow: hidden;
+        }
+
+        .notif-dropdown.show {
+            display: flex;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        .notif-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notif-list {
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .notif-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .notif-item.unread {
+            background: rgba(99, 102, 241, 0.08);
+            font-weight: 600;
+        }
+
+        .notif-item:hover {
+            background: var(--dropdown-hover);
+        }
+
+        .notif-time {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* TOAST ALERT SYSTEM */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--bg-surface);
+            border: 1px solid var(--accent-primary);
+            color: var(--text-primary);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: auto;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Feed Container */
+        .container {
+            max-width: 760px;
+            margin: 30px auto;
+            padding: 0 16px;
+        }
+
+        /* ALGORITHM FEED TABS */
+        .algo-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .algo-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+
+        .algo-btn.active {
+            color: var(--text-primary);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+        }
+
+        /* SEARCH & FILTER CONTROLS */
+        .filter-section {
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .search-box {
+            width: 100%;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 18px;
+            color: var(--text-primary);
+            outline: none;
+            font-size: 14px;
+        }
+
+        .search-box:focus {
+            border-color: var(--accent-primary);
+        }
+
+        .filter-tags {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: thin;
+        }
+
+        .filter-pill {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .filter-pill.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        /* Post Card Styling */
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-highlight);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: white;
+        }
+
+        .author-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .meta-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .tag {
+            background: rgba(99, 102, 241, 0.12);
+            color: var(--accent-primary);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .post-title {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .post-body {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        /* Reaction Buttons System */
+        .reactions-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .pill-btn {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pill-btn:hover {
+            border-color: var(--border-highlight);
+            color: var(--text-primary);
+            transform: scale(1.05);
+        }
+
+        .pill-btn.active-reaction {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .pill-btn.pop-anim {
+            animation: buttonPop 0.3s ease;
+        }
+
+        @keyframes buttonPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.25); }
+            100% { transform: scale(1); }
+        }
+
+        /* FLOATING EMOJI ANIMATION STYLES */
+        .floating-emoji {
+            position: fixed;
+            pointer-events: none;
+            font-size: 20px;
+            z-index: 9999;
+            animation: floatUpAndFade 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes floatUpAndFade {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(0.6) rotate(0deg);
+            }
+            50% {
+                opacity: 0.9;
+                transform: translate(var(--dx), -40px) scale(1.3) rotate(var(--rot));
+            }
+            100% {
+                opacity: 0;
+                transform: translate(calc(var(--dx) * 1.5), -80px) scale(0.8) rotate(calc(var(--rot) * 2));
+            }
+        }
+
+        /* FULL POST VIEW SCREEN */
+        #postDetailView {
+            display: none;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .back-btn {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: var(--border-color);
+        }
+
+        .full-post-container {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-highlight);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* Voice Player Widget */
+        .voice-player {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 10px 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: max-content;
+            min-width: 260px;
+        }
+
+        .play-btn {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Comments Section */
+        .comment-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 24px;
+            margin-top: 32px;
+        }
+
+        .comment-box-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .comment-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .comment-input, .form-input, .form-textarea, .form-select {
+            flex: 1;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            outline: none;
+            font-size: 14px;
+        }
+
+        .form-select option {
+            background: var(--bg-surface);
+            color: var(--text-primary);
+        }
+
+        .comment-input:focus, .form-input:focus, .form-textarea:focus, .form-select:focus {
+            border-color: var(--accent-primary);
+        }
+
+        /* MIC BUTTON & RECORDING STYLES */
+        .mic-btn {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mic-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .mic-btn.recording {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: var(--accent-danger);
+            color: var(--accent-danger);
+            animation: pulseRecord 1.2s infinite;
+        }
+
+        @keyframes pulseRecord {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .voice-preview-container {
+            display: none;
+            background: var(--bg-body);
+            border: 1px solid var(--border-highlight);
+            padding: 12px 16px;
+            border-radius: 12px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0 20px;
+            height: 44px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .single-comment {
+            background: var(--bg-body);
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+
+        /* CREATE POST MODAL OVERLAY */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .form-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-highlight);
+            width: 90%;
+            max-width: 550px;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        }
+
+        .form-group {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo" onclick="showFeed()">Loop 🚀</div>
+        <div class="nav-right">
+            <!-- Theme Toggle Button -->
+            <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">☀️ Light</button>
+
+            <!-- Notification Badge System -->
+            <div class="notif-container">
+                <button class="notif-btn" onclick="toggleNotifications()">
+                    🔔
+                    <span class="notif-badge" id="notifBadge" style="display: none;">0</span>
+                </button>
+                <div class="notif-dropdown" id="notifDropdown">
+                    <div class="notif-header">
+                        <span>Notifications</span>
+                        <span onclick="clearNotifications()" style="color: var(--accent-danger); cursor: pointer; font-size: 11px;">Clear All</span>
+                    </div>
+                    <div class="notif-list" id="notifList">
+                        <!-- Dynamic Notif Items Injected Here -->
+                    </div>
+                </div>
+            </div>
+
+            <button class="create-btn" onclick="openCreateModal()">+ Create Post</button>
+            <button class="ghost-badge">👻 Ghost: OFF</button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container">
+
+        <!-- SCREEN 1: MAIN FEED VIEW -->
+        <div id="feedView">
+
+            <!-- ADDICTIVE ALGORITHM FEED MODES -->
+            <div class="algo-tabs">
+                <button class="algo-btn active" onclick="setAlgoFeed('forYou', this)">✨ For You</button>
+                <button class="algo-btn" onclick="setAlgoFeed('trending', this)">🔥 Trending</button>
+                <button class="algo-btn" onclick="setAlgoFeed('latest', this)">⚡ Latest</button>
+            </div>
+
+            <!-- SEARCH & CATEGORY FILTER -->
+            <div class="filter-section">
+                <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search posts by title or content..." oninput="filterPosts()">
+                
+                <div class="filter-tags">
+                    <button class="filter-pill active" onclick="setCategoryFilter('All', this)">🔥 All Posts</button>
+                    <button class="filter-pill" onclick="setCategoryFilter('Study & Exams', this)">🎓 Study & Exams</button>
+                    <button class="filter-pill" onclick="setCategoryFilter('Video & Editing', this)">🎬 Video & Editing</button>
+                    <button class="filter-pill" onclick="setCategoryFilter('Gaming & Setup', this)">🎮 Gaming & Setup</button>
+                    <button class="filter-pill" onclick="setCategoryFilter('Tech & Coding', this)">💻 Tech & Coding</button>
+                    <button class="filter-pill" onclick="setCategoryFilter('Rant & Confessions', this)">🗣️ Rant & Confessions</button>
+                    <button class="filter-pill" onclick="setCategoryFilter('Ideas & Showcase', this)">💡 Ideas & Showcase</button>
+                </div>
+            </div>
+
+            <!-- POSTS LIST CONTAINER -->
+            <div id="postsContainer"></div>
+
+            <div id="noResults" class="no-results">
+                <h3>No matching posts found 🔍</h3>
+                <p style="margin-top: 6px; font-size: 13px;">Try searching for a different keyword or select another category filter.</p>
+            </div>
+
+        </div>
+
+        <!-- SCREEN 2: FULL DETAIL SCREEN -->
+        <div id="postDetailView">
+            <button class="back-btn" onclick="showFeed()">← Back to Feed</button>
+
+            <div class="full-post-container">
+                
+                <div class="card-header">
+                    <div class="author-info">
+                        <div class="avatar" id="detailAvatar" style="background: linear-gradient(135deg, #f43f5e, #fb7185);">A</div>
+                        <div>
+                            <div class="author-name" id="detailAuthor">alex_dev</div>
+                            <div class="meta-text">Posted in l/community • Just now</div>
+                        </div>
+                    </div>
+                    <span class="tag" id="detailTag">General</span>
+                </div>
+
+                <div class="post-title" id="detailTitle" style="font-size: 26px; font-weight: 700; margin-top: 16px; line-height: 1.3;"></div>
+
+                <div class="post-body" id="detailBody" style="font-size: 16px; margin-top: 16px; color: var(--text-primary); line-height: 1.6;"></div>
+
+                <!-- Detail View Reactions -->
+                <div class="reactions-container" style="margin-top: 20px;" id="detailReactions"></div>
+
+                <!-- Comments Section -->
+                <div class="comment-section">
+                    <div style="font-weight: 600; font-size: 16px; color: var(--text-primary);">Comments & Discussion</div>
+                    
+                    <div class="comment-box-wrapper">
+                        <div class="comment-box">
+                            <input type="text" class="comment-input" id="userComment" placeholder="Write a comment or drop a voice note...">
+                            <button class="mic-btn" id="micBtn" onclick="toggleVoiceRecording()" title="Record Voice Note">🎤</button>
+                            <button class="btn-primary" onclick="addComment()">Comment</button>
+                        </div>
+
+                        <!-- Voice Note Recording Preview Card -->
+                        <div class="voice-preview-container" id="voicePreview">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span>🎙️ Voice Note Recorded</span>
+                                <audio id="previewAudio" controls style="height: 32px; max-width: 220px;"></audio>
+                            </div>
+                            <button onclick="discardVoiceRecord()" style="background: transparent; border: none; color: var(--accent-danger); cursor: pointer; font-weight: bold; font-size: 13px;">Discard ✕</button>
+                        </div>
+                    </div>
+
+                    <div class="comments-list" id="commentsList"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- CREATE POST MODAL -->
+    <div class="modal-overlay" id="createModal">
+        <div class="form-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h2 style="font-size: 20px; font-weight: 700;">Create New Post 📝</h2>
+                <span onclick="closeCreateModal()" style="cursor: pointer; color: var(--text-secondary); font-weight: bold;">✕</span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Post Title</label>
+                <input type="text" id="newTitle" class="form-input" placeholder="What's on your mind?">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Select Category</label>
+                <select id="newTag" class="form-select">
+                    <option value="Study & Exams">🎓 Study & Exams</option>
+                    <option value="Video & Editing">🎬 Video & Editing</option>
+                    <option value="Gaming & Setup">🎮 Gaming & Setup</option>
+                    <option value="Tech & Coding">💻 Tech & Coding</option>
+                    <option value="Rant & Confessions">🗣️ Rant & Confessions</option>
+                    <option value="Ideas & Showcase">💡 Ideas & Showcase</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Post Body</label>
+                <textarea id="newBody" class="form-textarea" placeholder="Explain your thoughts or issue in detail..."></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
+                <button class="pill-btn" onclick="closeCreateModal()">Cancel</button>
+                <button class="btn-primary" style="padding: 10px 20px;" onclick="publishPost()">Publish Post 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ---------------- 1. INITIAL SEED DATA FOR ALGORITHM ----------------
+        const defaultPosts = [
+            {
+                id: "p1",
+                title: "After Effects me Transparent Grid / Solid Layers fix kaise karein? 🎬",
+                body: "Motion 4 plugin install karne ke baad jab bhi solid layer create karo grid overlay display glitch hota hai. Kisi ke paas timeline configuration fix hai?",
+                author: "motion_ninja",
+                initial: "M",
+                gradient: "linear-gradient(135deg, #a855f7, #ec4899)",
+                tag: "Video & Editing",
+                timestamp: Date.now() - 600000,
+                fireCount: 24,
+                bulbCount: 11,
+                laughCount: 5,
+                comments: [
+                    { author: "System Bot", text: "Try clearing cache and resetting plugin keyframes!" }
+                ]
+            },
+            {
+                id: "p2",
+                title: "GTA V ka Pehla Mission Screen Black Screen Aane Par Fix 🎮",
+                body: "Game download karne ke baad opening mission sequence me hi complete black screen dikhti hai. Graphics driver update karein ya config file tweak?",
+                author: "gamer_x",
+                initial: "G",
+                gradient: "linear-gradient(135deg, #ef4444, #f97316)",
+                tag: "Gaming & Setup",
+                timestamp: Date.now() - 2700000,
+                fireCount: 45,
+                bulbCount: 19,
+                laughCount: 12,
+                comments: [
+                    { author: "pro_gamer", text: "V-Sync ON karke restart karo!" }
+                ]
+            },
+            {
+                id: "p3",
+                title: "Maths internal exams me percentage calculate karne ka best structure 🎓",
+                body: "Trigonometry aur Physics numericals me step marks miss na ho, school teachers ke strict feedback ke according preparation chart.",
+                author: "student_pro",
+                initial: "S",
+                gradient: "linear-gradient(135deg, #10b981, #06b6d4)",
+                tag: "Study & Exams",
+                timestamp: Date.now() - 7200000,
+                fireCount: 29,
+                bulbCount: 34,
+                laughCount: 3,
+                comments: []
+            }
+        ];
+
+        let postsData = JSON.parse(localStorage.getItem('loop_posts_v2')) || defaultPosts;
+
+        function savePosts() {
+            localStorage.setItem('loop_posts_v2', JSON.stringify(postsData));
+        }
+
+        // ---------------- 2. TOAST NOTIFICATION SYSTEM ----------------
+        function showToast(message, icon = "✅") {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ---------------- 3. POST SHARE / LINK COPY SYSTEM ----------------
+        function sharePost(event, postId) {
+            event.stopPropagation();
+            const post = postsData.find(p => p.id === postId);
+            if (!post) return;
+
+            const postUrl = `${window.location.origin}${window.location.pathname}#post-${postId}`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: post.title,
+                    text: post.body.substring(0, 80) + "...",
+                    url: postUrl
+                }).then(() => {
+                    showToast("Post shared successfully! 🎉");
+                }).catch(() => {
+                    copyToClipboard(postUrl);
+                });
+            } else {
+                copyToClipboard(postUrl);
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("Direct Post Link copied to clipboard! 📋");
+            }).catch(() => {
+                showToast("Failed to copy link!", "❌");
+            });
+        }
+
+        // ---------------- 4. LIGHT / DARK THEME ----------------
+        let currentTheme = localStorage.getItem('loop_theme') || 'dark';
+
+        function applyTheme() {
+            const html = document.documentElement;
+            const themeBtn = document.getElementById('themeBtn');
+            if (currentTheme === 'dark') {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                themeBtn.innerText = '☀️ Light';
+            } else {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                themeBtn.innerText = '🌙 Dark';
+            }
+            localStorage.setItem('loop_theme', currentTheme);
+        }
+
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme();
+        }
+
+        applyTheme();
+
+        // ---------------- 5. NOTIFICATION SYSTEM ----------------
+        let notifications = JSON.parse(localStorage.getItem('loop_notifications')) || [
+            { id: 1, text: "Welcome to Loop Community Platform 🚀", time: "Just now", read: false }
+        ];
+
+        function renderNotifications() {
+            const list = document.getElementById('notifList');
+            const badge = document.getElementById('notifBadge');
+            const unreadCount = notifications.filter(n => !n.read).length;
+
+            if (unreadCount > 0) {
+                badge.innerText = unreadCount;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+
+            if (notifications.length === 0) {
+                list.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 12px;">No notifications yet</div>`;
+            } else {
+                list.innerHTML = notifications.map(n => `
+                    <div class="notif-item ${!n.read ? 'unread' : ''}">
+                        <div>${n.text}</div>
+                        <span class="notif-time">${n.time}</span>
+                    </div>
+                `).join('');
+            }
+
+            localStorage.setItem('loop_notifications', JSON.stringify(notifications));
+        }
+
+        function triggerNotification(text) {
+            notifications.unshift({
+                id: Date.now(),
+                text: text,
+                time: "Just now",
+                read: false
+            });
+            renderNotifications();
+        }
+
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notifDropdown');
+            const isShowing = dropdown.classList.contains('show');
+            
+            if (!isShowing) {
+                dropdown.classList.add('show');
+                notifications = notifications.map(n => ({ ...n, read: true }));
+                renderNotifications();
+            } else {
+                dropdown.classList.remove('show');
+            }
+        }
+
+        function clearNotifications() {
+            notifications = [];
+            renderNotifications();
+        }
+
+        document.addEventListener('click', (e) => {
+            const container = document.querySelector('.notif-container');
+            if (container && !container.contains(e.target)) {
+                document.getElementById('notifDropdown').classList.remove('show');
+            }
+        });
+
+        renderNotifications();
+
+        // ---------------- 6. ALGORITHM & FEED ENGINE ----------------
+        let selectedCategory = 'All';
+        let currentAlgoMode = 'forYou';
+        let currentActivePostId = null;
+
+        function calculateEngagementScore(post) {
+            const totalReactions = post.fireCount + post.bulbCount + post.laughCount;
+            const commentsWeight = post.comments.length * 3;
+            const reactionsWeight = totalReactions * 2;
+            const hoursAgo = (Date.now() - post.timestamp) / (1000 * 60 * 60);
+            const recencyScore = Math.max(0, 10 - hoursAgo);
+
+            return reactionsWeight + commentsWeight + recencyScore;
+        }
+
+        function getAlgorithmicFeed() {
+            let sorted = [...postsData];
+
+            if (currentAlgoMode === 'latest') {
+                return sorted.sort((a, b) => b.timestamp - a.timestamp);
+            } 
+            
+            if (currentAlgoMode === 'trending') {
+                return sorted.sort((a, b) => calculateEngagementScore(b) - calculateEngagementScore(a));
+            }
+
+            sorted.sort((a, b) => calculateEngagementScore(b) - calculateEngagementScore(a));
+            if (sorted.length > 3) {
+                let temp = sorted[1];
+                sorted[1] = sorted[2];
+                sorted[2] = temp;
+            }
+
+            return sorted;
+        }
+
+        function setAlgoFeed(mode, btn) {
+            currentAlgoMode = mode;
+            document.querySelectorAll('.algo-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderFeed();
+        }
+
+        function renderFeed() {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = '';
+
+            const feed = getAlgorithmicFeed();
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            feed.forEach(post => {
+                const matchesQuery = post.title.toLowerCase().includes(query) || post.body.toLowerCase().includes(query);
+                const matchesCategory = (selectedCategory === 'All') || (post.tag === selectedCategory);
+
+                if (matchesQuery && matchesCategory) {
+                    visibleCount++;
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.setAttribute('data-category', post.tag);
+                    card.onclick = () => openFullPost(post.id);
+
+                    const totalComments = post.comments.length;
+
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <div class="author-info">
+                                <div class="avatar" style="background: ${post.gradient};">${post.initial}</div>
+                                <div>
+                                    <div class="author-name">${post.author}</div>
+                                    <div class="meta-text">Posted in l/community • ${timeAgo(post.timestamp)}</div>
+                                </div>
+                            </div>
+                            <span class="tag">${post.tag}</span>
+                        </div>
+                        <div class="post-title">${post.title}</div>
+                        <div class="post-body">${post.body.substring(0, 110)}${post.body.length > 110 ? '...' : ''}</div>
+                        
+                        <div class="reactions-container">
+                            <button class="pill-btn" onclick="handleReaction(event, '${post.id}', 'fire')">🔥 <span class="count">${post.fireCount}</span></button>
+                            <button class="pill-btn" onclick="handleReaction(event, '${post.id}', 'bulb')">💡 <span class="count">${post.bulbCount}</span></button>
+                            <button class="pill-btn" onclick="handleReaction(event, '${post.id}', 'laugh')">😂 <span class="count">${post.laughCount}</span></button>
+                            <button class="pill-btn" style="cursor: default;" onclick="event.stopPropagation();">💬 ${totalComments} Comments</button>
+                            <button class="pill-btn" onclick="sharePost(event, '${post.id}')">🔗 Share</button>
+                        </div>
+                    `;
+
+                    container.appendChild(card);
+                }
+            });
+
+            document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+
+        function timeAgo(timestamp) {
+            const seconds = Math.floor((Date.now() - timestamp) / 1000);
+            if (seconds < 60) return "Just now";
+            const mins = Math.floor(seconds / 60);
+            if (mins < 60) return `${mins}m ago`;
+            const hours = Math.floor(mins / 60);
+            if (hours < 24) return `${hours}h ago`;
+            return `${Math.floor(hours / 24)}d ago`;
+        }
+
+        // Ghost Mode Toggle
+        const ghostBtn = document.querySelector('.ghost-badge');
+        let isGhost = false;
+
+        if (ghostBtn) {
+            ghostBtn.addEventListener('click', () => {
+                isGhost = !isGhost;
+                if(isGhost) {
+                    ghostBtn.innerHTML = "👻 Ghost: ON";
+                    ghostBtn.style.background = "rgba(239, 68, 68, 0.1)";
+                    ghostBtn.style.borderColor = "rgba(239, 68, 68, 0.5)";
+                    ghostBtn.style.color = "#ef4444";
+                    showToast("Ghost Mode Enabled! You are now anonymous.", "👻");
+                } else {
+                    ghostBtn.innerHTML = "👻 Ghost: OFF";
+                    ghostBtn.style.background = "rgba(251, 191, 36, 0.08)";
+                    ghostBtn.style.borderColor = "rgba(251, 191, 36, 0.25)";
+                    ghostBtn.style.color = "#fbbf24";
+                    showToast("Ghost Mode Disabled!", "👤");
+                }
+            });
+        }
+
+        // REACTION SYSTEM WITH LIVE SCORE RE-RANKING
+        function handleReaction(event, postId, type) {
+            event.stopPropagation();
+
+            const post = postsData.find(p => p.id === postId);
+            if (!post) return;
+
+            const targetBtn = event.currentTarget;
+            const emojiSymbol = type === 'fire' ? '🔥' : type === 'bulb' ? '💡' : '😂';
+
+            if (type === 'fire') post.fireCount++;
+            if (type === 'bulb') post.bulbCount++;
+            if (type === 'laugh') post.laughCount++;
+
+            savePosts();
+            createEmojiBurst(event, emojiSymbol);
+            triggerNotification(`Someone reacted ${emojiSymbol} on post: "${post.title.substring(0, 15)}..."`);
+
+            targetBtn.classList.add('pop-anim');
+            setTimeout(() => targetBtn.classList.remove('pop-anim'), 300);
+
+            renderFeed();
+        }
+
+        function createEmojiBurst(event, emojiSymbol) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const startX = rect.left + rect.width / 2;
+            const startY = rect.top;
+
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement('span');
+                particle.className = 'floating-emoji';
+                particle.innerText = emojiSymbol;
+
+                const dx = (Math.random() - 0.5) * 80;
+                const rot = (Math.random() - 0.5) * 60;
+
+                particle.style.left = `${startX}px`;
+                particle.style.top = `${startY}px`;
+                particle.style.setProperty('--dx', `${dx}px`);
+                particle.style.setProperty('--rot', `${rot}deg`);
+
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 800);
+            }
+        }
+
+        // VOICE COMMENT RECORDING SYSTEM
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        let recordedAudioUrl = null;
+        let recordingTimer = null;
+        let recordSeconds = 0;
+
+        async function toggleVoiceRecording() {
+            const micBtn = document.getElementById('micBtn');
+
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = (e) => {
+                        if (e.data.size > 0) audioChunks.push(e.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        recordedAudioUrl = URL.createObjectURL(audioBlob);
+                        
+                        const previewAudio = document.getElementById('previewAudio');
+                        previewAudio.src = recordedAudioUrl;
+                        document.getElementById('voicePreview').style.display = 'flex';
+
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    recordSeconds = 0;
+                    micBtn.classList.add('recording');
+                    micBtn.innerText = "⏹️";
+
+                    recordingTimer = setInterval(() => {
+                        recordSeconds++;
+                        micBtn.title = `Recording... ${recordSeconds}s (Click to stop)`;
+                    }, 1000);
+
+                } catch (err) {
+                    showToast("Microphone permission denied!", "⚠️");
+                }
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+                clearInterval(recordingTimer);
+                micBtn.classList.remove('recording');
+                micBtn.innerText = "🎤";
+                micBtn.title = "Record Voice Note";
+            }
+        }
+
+        function discardVoiceRecord() {
+            recordedAudioUrl = null;
+            document.getElementById('voicePreview').style.display = 'none';
+            document.getElementById('previewAudio').src = "";
+        }
+
+        // FULL POST VIEW
+        function openFullPost(postId) {
+            const post = postsData.find(p => p.id === postId);
+            if (!post) return;
+
+            currentActivePostId = postId;
+            window.location.hash = `post-${postId}`;
+
+            document.getElementById('feedView').style.display = 'none';
+
+            document.getElementById('detailTitle').innerText = post.title;
+            document.getElementById('detailBody').innerText = post.body;
+            document.getElementById('detailAuthor').innerText = post.author;
+            document.getElementById('detailTag').innerText = post.tag;
+            
+            const avatar = document.getElementById('detailAvatar');
+            avatar.innerText = post.initial;
+            avatar.style.background = post.gradient;
+
+            // Render Detail Reactions & Share
+            const reactionsBox = document.getElementById('detailReactions');
+            reactionsBox.innerHTML = `
+                <button class="pill-btn" onclick="handleReaction(event, '${post.id}', 'fire')">🔥 <span class="count">${post.fireCount}</span></button>
+                <button class="pill-btn" onclick="handleReaction(event, '${post.id}', 'bulb')">💡 <span class="count">${post.bulbCount}</span></button>
+                <button class="pill-btn" onclick="handleReaction(event, '${post.id}', 'laugh')">😂 <span class="count">${post.laughCount}</span></button>
+                <button class="pill-btn" onclick="sharePost(event, '${post.id}')">🔗 Share Post</button>
+            `;
+
+            renderComments(post);
+
+            document.getElementById('postDetailView').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        function renderComments(post) {
+            const list = document.getElementById('commentsList');
+            if (!post.comments || post.comments.length === 0) {
+                list.innerHTML = `
+                    <div class="single-comment">
+                        <div class="comment-author">👻 System Bot</div>
+                        <div>Be the first one to share feedback or drop a voice comment on this post!</div>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = post.comments.map(c => `
+                <div class="single-comment">
+                    <div class="comment-author">${c.author}</div>
+                    ${c.text ? `<div>${c.text}</div>` : ''}
+                    ${c.voiceUrl ? `
+                        <div style="margin-top: 8px;">
+                            <div class="voice-player">
+                                <button class="play-btn" onclick="toggleAudioPlay(this)">▶</button>
+                                <audio src="${c.voiceUrl}" onended="resetAudioPlay(this)"></audio>
+                                <span style="font-size: 12px; color: var(--text-secondary);">🎙️ Voice Note</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function showFeed() {
+            window.location.hash = '';
+            document.getElementById('postDetailView').style.display = 'none';
+            document.getElementById('feedView').style.display = 'block';
+            window.scrollTo(0, 0);
+            renderFeed();
+        }
+
+        function setCategoryFilter(category, btnElement) {
+            selectedCategory = category;
+            document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            renderFeed();
+        }
+
+        function filterPosts() {
+            renderFeed();
+        }
+
+        // ADD COMMENT LOGIC
+        function addComment() {
+            const input = document.getElementById('userComment');
+            const post = postsData.find(p => p.id === currentActivePostId);
+            if (!post) return;
+
+            const hasText = input && input.value.trim() !== "";
+            const hasVoice = !!recordedAudioUrl;
+
+            if (hasText || hasVoice) {
+                const authorName = isGhost ? "👻 Anonymous Ghost" : "You (Member)";
+
+                post.comments.unshift({
+                    author: authorName,
+                    text: hasText ? input.value.trim() : null,
+                    voiceUrl: recordedAudioUrl ? recordedAudioUrl : null
+                });
+
+                savePosts();
+                renderComments(post);
+                triggerNotification(`New comment added on post by ${authorName}`);
+                showToast("Comment posted successfully!", "💬");
+
+                input.value = "";
+                discardVoiceRecord();
+            } else {
+                showToast("Please write text or record a voice note first!", "⚠️");
+            }
+        }
+
+        function toggleAudioPlay(btn) {
+            const audio = btn.nextElementSibling;
+            if (audio.paused) {
+                audio.play();
+                btn.innerText = "⏸️";
+            } else {
+                audio.pause();
+                btn.innerText = "▶";
+            }
+        }
+
+        function resetAudioPlay(audio) {
+            const btn = audio.previousElementSibling;
+            btn.innerText = "▶";
+        }
+
+        function openCreateModal() {
+            document.getElementById('createModal').style.display = 'flex';
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createModal').style.display = 'none';
+        }
+
+        function publishPost() {
+            const titleInput = document.getElementById('newTitle');
+            const tagInput = document.getElementById('newTag');
+            const bodyInput = document.getElementById('newBody');
+
+            const title = titleInput.value.trim();
+            const tag = tagInput.value;
+            const body = bodyInput.value.trim();
+
+            if(!title || !body) {
+                showToast("Title and body fields cannot be empty!", "⚠️");
+                return;
+            }
+
+            const authorName = isGhost ? "anonymous_ghost" : "you_creator";
+            const initial = isGhost ? "👻" : "Y";
+            const gradient = isGhost ? "linear-gradient(135deg, #6b7280, #9ca3af)" : "linear-gradient(135deg, #10b981, #34d399)";
+
+            const newPost = {
+                id: "p_" + Date.now(),
+                title: title,
+                body: body,
+                author: authorName,
+                initial: initial,
+                gradient: gradient,
+                tag: tag,
+                timestamp: Date.now(),
+                fireCount: 0,
+                bulbCount: 0,
+                laughCount: 0,
+                comments: []
+            };
+
+            postsData.unshift(newPost);
+            savePosts();
+
+            triggerNotification(`Your post "${title.substring(0, 20)}..." is published successfully!`);
+            showToast("New post published successfully! 🚀");
+
+            titleInput.value = '';
+            bodyInput.value = '';
+            closeCreateModal();
+
+            renderFeed();
+        }
+
+        // DIRECT LINK ROUTING ON LOAD
+        function handleHashRouting() {
+            const hash = window.location.hash;
+            if (hash.startsWith("#post-")) {
+                const postId = hash.replace("#post-", "");
+                openFullPost(postId);
+            } else {
+                showFeed();
+            }
+        }
+
+        window.addEventListener('hashchange', handleHashRouting);
+
+        // INITIAL RENDER
+        handleHashRouting();
+    </script>
+
+</body>
+</html>
