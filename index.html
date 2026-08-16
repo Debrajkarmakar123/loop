@@ -1153,7 +1153,7 @@
                     const card = document.createElement('div');
                     card.className = 'card';
                     card.setAttribute('data-category', post.tag);
-                    card.onclick = () => { window.location.href = `posts/${post.id}.html`; };
+                   card.onclick = () => openFullPost(post.id);
 
                     const totalComments = post.comments.length;
 

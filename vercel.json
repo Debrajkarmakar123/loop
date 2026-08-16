@@ -1,0 +1,13 @@
+{
+  "cleanUrls": true,
+  "routes": [
+    {
+      "src": "/posts/(.*)",
+      "dest": "/posts/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+}
