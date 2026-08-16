@@ -776,7 +776,23 @@
             </div>
 
             <!-- POSTS LIST CONTAINER -->
-            <div id="postsContainer"></div>
+            <div id="postsContainer">
+
+<div class="card" onclick="window.location.href='posts/gta-5-black-screen-fix-opening-mission-1786859401.html'">
+    <div class="card-header">
+        <div class="author-info">
+            <div class="avatar" style="background: linear-gradient(135deg, #ef4444, #f97316);">G</div>
+            <div>
+                <div class="author-name">@gamer_pro99</div>
+                <div class="meta-text">Posted in l/community • Just now</div>
+            </div>
+        </div>
+        <span class="tag">Gaming & Setup</span>
+    </div>
+    <div class="post-title"><a href="posts/gta-5-black-screen-fix-opening-mission-1786859401.html" style="color: inherit; text-decoration: none;">GTA 5 Black Screen Fix Opening Mission</a></div>
+    <div class="post-body">Go to graphics settings, change DirectX 12 to DirectX 11, and update GPU drivers....</div>
+</div>
+</div>
 
             <div id="noResults" class="no-results">
                 <h3>No matching posts found 🔍</h3>
@@ -1137,7 +1153,7 @@
                     const card = document.createElement('div');
                     card.className = 'card';
                     card.setAttribute('data-category', post.tag);
-                    card.onclick = () => openFullPost(post.id);
+                    card.onclick = () => { window.location.href = `posts/${post.id}.html`; };
 
                     const totalComments = post.comments.length;
 
