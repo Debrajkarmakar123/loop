@@ -3,7 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loop Community Platform</title>
+
+    <!-- DEFAULT SEO META TAGS -->
+    <title id="seoTitle">Loop Community Platform - Discussions & Trends</title>
+    <meta id="seoDesc" name="description" content="Join discussions, ask questions, share knowledge, and explore trending posts on Loop Community Platform.">
+    <meta id="ogTitle" property="og:title" content="Loop Community Platform">
+    <meta id="ogDesc" property="og:description" content="Explore top trending discussions and share your thoughts.">
+    <meta property="og:type" content="website">
+
+    <!-- DYNAMIC SEO INJECTION SCRIPT FOR SEARCH ENGINE CRAWLERS & ROUTING -->
+    <script>
+        (function injectDynamicSEO() {
+            const postsMetaData = {
+                "p1": {
+                    title: "After Effects Transparent Grid / Solid Layers Fix | Loop",
+                    desc: "Fix Motion 4 plugin grid glitches and solid layer transparency bugs in Adobe After Effects easily."
+                },
+                "p2": {
+                    title: "GTA V Opening Mission Black Screen Fix | Loop",
+                    desc: "Resolve black screen bugs on GTA V opening mission by switching DirectX settings and updating drivers."
+                },
+                "p3": {
+                    title: "Maths Internal Exam Score Calculation & Structure | Loop",
+                    desc: "Step-by-step guide to calculating percentage and securing step marks in internal school examinations."
+                }
+            };
+
+            const params = new URLSearchParams(window.location.search);
+            const postId = params.get('post');
+
+            if (postId && postsMetaData[postId]) {
+                const meta = postsMetaData[postId];
+                document.title = meta.title;
+                
+                const descTag = document.getElementById('seoDesc');
+                if (descTag) descTag.setAttribute('content', meta.desc);
+
+                const ogTitleTag = document.getElementById('ogTitle');
+                if (ogTitleTag) ogTitleTag.setAttribute('content', meta.title);
+
+                const ogDescTag = document.getElementById('ogDesc');
+                if (ogDescTag) ogDescTag.setAttribute('content', meta.desc);
+            }
+        })();
+    </script>
+
     <style>
         /* BASE THEME VARIABLES (Dark Mode Default) */
         :root {
@@ -1354,6 +1398,13 @@
 
             currentActivePostId = postId;
 
+            // DYNAMICALLY UPDATE DOCUMENT TITLE & META DESCRIPTION FOR BETTER SEO
+            document.title = `${post.title} | Loop`;
+            const seoDesc = document.getElementById('seoDesc');
+            if (seoDesc) {
+                seoDesc.setAttribute('content', post.body.substring(0, 150));
+            }
+
             document.getElementById('feedView').style.display = 'none';
 
             document.getElementById('detailTitle').innerText = post.title;
@@ -1413,6 +1464,12 @@
 
         function showFeedUI() {
             currentActivePostId = null;
+            document.title = "Loop Community Platform - Discussions & Trends";
+            const seoDesc = document.getElementById('seoDesc');
+            if (seoDesc) {
+                seoDesc.setAttribute('content', 'Join discussions, ask questions, share knowledge, and explore trending posts on Loop Community Platform.');
+            }
+
             document.getElementById('postDetailView').style.display = 'none';
             document.getElementById('feedView').style.display = 'block';
             window.scrollTo(0, 0);
