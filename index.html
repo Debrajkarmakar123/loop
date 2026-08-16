@@ -443,12 +443,6 @@
             transform: scale(1.05);
         }
 
-        .pill-btn.active-reaction {
-            background: rgba(99, 102, 241, 0.15);
-            border-color: var(--accent-primary);
-            color: var(--accent-primary);
-        }
-
         .pill-btn.pop-anim {
             animation: buttonPop 0.3s ease;
         }
@@ -720,7 +714,7 @@
 
     <!-- NAVBAR -->
     <div class="navbar">
-        <div class="logo" onclick="showFeed()">Loop 🚀</div>
+        <div class="logo" onclick="navigateToFeed()">Loop 🚀</div>
         <div class="nav-right">
             <!-- Theme Toggle Button -->
             <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">☀️ Light</button>
@@ -753,7 +747,7 @@
         <!-- SCREEN 1: MAIN FEED VIEW -->
         <div id="feedView">
 
-            <!-- ADDICTIVE ALGORITHM FEED MODES -->
+            <!-- ALGORITHM FEED MODES -->
             <div class="algo-tabs">
                 <button class="algo-btn active" onclick="setAlgoFeed('forYou', this)">✨ For You</button>
                 <button class="algo-btn" onclick="setAlgoFeed('trending', this)">🔥 Trending</button>
@@ -787,7 +781,7 @@
 
         <!-- SCREEN 2: FULL DETAIL SCREEN -->
         <div id="postDetailView">
-            <button class="back-btn" onclick="showFeed()">← Back to Feed</button>
+            <button class="back-btn" onclick="navigateToFeed()">← Back to Feed</button>
 
             <div class="full-post-container">
                 
@@ -936,7 +930,42 @@
             localStorage.setItem('loop_posts_v2', JSON.stringify(postsData));
         }
 
-        // ---------------- 2. TOAST NOTIFICATION SYSTEM ----------------
+        // ---------------- 2. URL QUERY PARAMETER ROUTER ----------------
+        function handleRouting() {
+            const params = new URLSearchParams(window.location.search);
+            const postId = params.get('post');
+
+            if (postId) {
+                const targetPost = postsData.find(p => p.id === postId);
+                if (targetPost) {
+                    openFullPost(postId, false);
+                } else {
+                    showToast("Post not found!", "❌");
+                    navigateToFeed(false);
+                }
+            } else {
+                showFeedUI();
+            }
+        }
+
+        function navigateToPost(postId) {
+            const newUrl = `${window.location.pathname}?post=${postId}`;
+            window.history.pushState({ post: postId }, '', newUrl);
+            openFullPost(postId, false);
+        }
+
+        function navigateToFeed(pushHistory = true) {
+            if (pushHistory) {
+                window.history.pushState({}, '', window.location.pathname);
+            }
+            showFeedUI();
+        }
+
+        window.addEventListener('popstate', () => {
+            handleRouting();
+        });
+
+        // ---------------- 3. TOAST NOTIFICATION SYSTEM ----------------
         function showToast(message, icon = "✅") {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -953,13 +982,13 @@
             }, 3000);
         }
 
-        // ---------------- 3. POST SHARE / LINK COPY SYSTEM ----------------
+        // ---------------- 4. POST SHARE / QUERY LINK COPY SYSTEM ----------------
         function sharePost(event, postId) {
             event.stopPropagation();
             const post = postsData.find(p => p.id === postId);
             if (!post) return;
 
-            const postUrl = `${window.location.origin}${window.location.pathname}`;
+            const postUrl = `${window.location.origin}${window.location.pathname}?post=${postId}`;
 
             if (navigator.share) {
                 navigator.share({
@@ -984,7 +1013,7 @@
             });
         }
 
-        // ---------------- 4. LIGHT / DARK THEME ----------------
+        // ---------------- 5. LIGHT / DARK THEME ----------------
         let currentTheme = localStorage.getItem('loop_theme') || 'dark';
 
         function applyTheme() {
@@ -1009,7 +1038,7 @@
 
         applyTheme();
 
-        // ---------------- 5. NOTIFICATION SYSTEM ----------------
+        // ---------------- 6. NOTIFICATION SYSTEM ----------------
         let notifications = JSON.parse(localStorage.getItem('loop_notifications')) || [
             { id: 1, text: "Welcome to Loop Community Platform 🚀", time: "Just now", read: false }
         ];
@@ -1077,7 +1106,7 @@
 
         renderNotifications();
 
-        // ---------------- 6. ALGORITHM & FEED ENGINE ----------------
+        // ---------------- 7. ALGORITHM & FEED ENGINE ----------------
         let selectedCategory = 'All';
         let currentAlgoMode = 'forYou';
         let currentActivePostId = null;
@@ -1138,8 +1167,8 @@
                     card.className = 'card';
                     card.setAttribute('data-category', post.tag);
                     
-                    // CLEAN SINGLE PAGE DISPLAY CLICK
-                    card.onclick = () => openFullPost(post.id);
+                    // QUERY PARAM NAVIGATION CLICK
+                    card.onclick = () => navigateToPost(post.id);
 
                     const totalComments = post.comments.length;
 
@@ -1227,6 +1256,9 @@
             targetBtn.classList.add('pop-anim');
             setTimeout(() => targetBtn.classList.remove('pop-anim'), 300);
 
+            if (currentActivePostId === postId) {
+                renderDetailReactions(post);
+            }
             renderFeed();
         }
 
@@ -1315,7 +1347,7 @@
             document.getElementById('previewAudio').src = "";
         }
 
-        // FULL POST VIEW (CLEAN URL - NO HASH)
+        // FULL POST VIEW
         function openFullPost(postId) {
             const post = postsData.find(p => p.id === postId);
             if (!post) return;
@@ -1333,7 +1365,14 @@
             avatar.innerText = post.initial;
             avatar.style.background = post.gradient;
 
-            // Render Detail Reactions & Share
+            renderDetailReactions(post);
+            renderComments(post);
+
+            document.getElementById('postDetailView').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        function renderDetailReactions(post) {
             const reactionsBox = document.getElementById('detailReactions');
             reactionsBox.innerHTML = `
                 <button class="pill-btn" onclick="handleReaction(event, '${post.id}', 'fire')">🔥 <span class="count">${post.fireCount}</span></button>
@@ -1341,11 +1380,6 @@
                 <button class="pill-btn" onclick="handleReaction(event, '${post.id}', 'laugh')">😂 <span class="count">${post.laughCount}</span></button>
                 <button class="pill-btn" onclick="sharePost(event, '${post.id}')">🔗 Share Post</button>
             `;
-
-            renderComments(post);
-
-            document.getElementById('postDetailView').style.display = 'block';
-            window.scrollTo(0, 0);
         }
 
         function renderComments(post) {
@@ -1377,7 +1411,8 @@
             `).join('');
         }
 
-        function showFeed() {
+        function showFeedUI() {
+            currentActivePostId = null;
             document.getElementById('postDetailView').style.display = 'none';
             document.getElementById('feedView').style.display = 'block';
             window.scrollTo(0, 0);
@@ -1495,8 +1530,8 @@
             renderFeed();
         }
 
-        // INITIAL RENDER
-        showFeed();
+        // INITIAL ROUTE ROUTING EXECUTION
+        handleRouting();
     </script>
 
 </body>
