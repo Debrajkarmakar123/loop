@@ -959,7 +959,7 @@
             const post = postsData.find(p => p.id === postId);
             if (!post) return;
 
-            const postUrl = `${window.location.origin}${window.location.pathname}#post-${postId}`;
+            const postUrl = `${window.location.origin}${window.location.pathname}`;
 
             if (navigator.share) {
                 navigator.share({
@@ -978,7 +978,7 @@
 
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
-                showToast("Direct Post Link copied to clipboard! 📋");
+                showToast("Link copied to clipboard! 📋");
             }).catch(() => {
                 showToast("Failed to copy link!", "❌");
             });
@@ -1138,7 +1138,7 @@
                     card.className = 'card';
                     card.setAttribute('data-category', post.tag);
                     
-                    // ✅ DIRECT SINGLE PAGE APP CLICK (NO 404 ERROR)
+                    // CLEAN SINGLE PAGE DISPLAY CLICK
                     card.onclick = () => openFullPost(post.id);
 
                     const totalComments = post.comments.length;
@@ -1315,13 +1315,12 @@
             document.getElementById('previewAudio').src = "";
         }
 
-        // FULL POST VIEW
+        // FULL POST VIEW (CLEAN URL - NO HASH)
         function openFullPost(postId) {
             const post = postsData.find(p => p.id === postId);
             if (!post) return;
 
             currentActivePostId = postId;
-            window.location.hash = `post-${postId}`;
 
             document.getElementById('feedView').style.display = 'none';
 
@@ -1379,7 +1378,6 @@
         }
 
         function showFeed() {
-            window.location.hash = '';
             document.getElementById('postDetailView').style.display = 'none';
             document.getElementById('feedView').style.display = 'block';
             window.scrollTo(0, 0);
@@ -1497,21 +1495,8 @@
             renderFeed();
         }
 
-        // DIRECT LINK ROUTING ON LOAD
-        function handleHashRouting() {
-            const hash = window.location.hash;
-            if (hash.startsWith("#post-")) {
-                const postId = hash.replace("#post-", "");
-                openFullPost(postId);
-            } else {
-                showFeed();
-            }
-        }
-
-        window.addEventListener('hashchange', handleHashRouting);
-
         // INITIAL RENDER
-        handleHashRouting();
+        showFeed();
     </script>
 
 </body>
